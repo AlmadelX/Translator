@@ -19,9 +19,17 @@ def get_input():
 
 def main():
     load_dotenv()
+
     input_filename, output_filename = get_input()
+
     logger = Logger()
     logger.info(f'Started translating {input_filename}')
+
     shutil.copyfile(input_filename, output_filename)
+
     parser = HTMLParser(output_filename)
+    while text := parser.get_text():
+        print(text)
+        parser.set_text('Быть или не быть')
+
     logger.info(f'Finished translating {input_filename} into {output_filename}')
