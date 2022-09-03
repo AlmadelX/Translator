@@ -1,10 +1,6 @@
 # Translator
 Usage:
-1. Setup ```.env``` file:
-    ```
-    LOFILE=path_to_logfile
-    ```
-2. Run the script:
+1. Run the script:
     ```commandline
-    python translator.py -i input.html -o output.html
+    python translator.py -f path_to/file.html 
     ```

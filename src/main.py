@@ -1,35 +1,17 @@
 import argparse
-import shutil
 
-from dotenv import load_dotenv
-
-from src.html_parser import HTMLParser
-from src.logger import Logger
+from src.html_processor import HTMLProcessor
 
 
-def get_input():
+def get_filename() -> str:
     arguments_parser = argparse.ArgumentParser()
-    arguments_parser.add_argument('-i', type=str, required=True)
-    arguments_parser.add_argument('-o', type=str, required=True)
+    arguments_parser.add_argument('-f', type=str, required=True)
     arguments = arguments_parser.parse_args()
-    input_filename = arguments.i
-    output_filename = arguments.o
-    return input_filename, output_filename
+    return arguments.f
 
 
 def main():
-    load_dotenv()
+    filename = get_filename()
 
-    input_filename, output_filename = get_input()
-
-    logger = Logger()
-    logger.info(f'Started translating {input_filename}')
-
-    shutil.copyfile(input_filename, output_filename)
-
-    parser = HTMLParser(output_filename)
-    while text := parser.get_text():
-        print(text)
-        parser.set_text('Быть или не быть')
-
-    logger.info(f'Finished translating {input_filename} into {output_filename}')
+    processor = HTMLProcessor(filename)
+    processor.process()
