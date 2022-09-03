@@ -19,5 +19,9 @@ def get_input():
 def main():
     load_dotenv()
     input_filename, output_filename = get_input()
-    logger = Logger(input_filename)
+    logger = Logger()
+    logger.info(f'Started translating {input_filename}')
+
     shutil.copyfile(input_filename, output_filename)
+
+    logger.info(f'Finished translating {input_filename} into {output_filename}')
