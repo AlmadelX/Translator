@@ -3,6 +3,7 @@ import shutil
 
 from dotenv import load_dotenv
 
+from src.html_parser import HTMLParser
 from src.logger import Logger
 
 
@@ -21,7 +22,6 @@ def main():
     input_filename, output_filename = get_input()
     logger = Logger()
     logger.info(f'Started translating {input_filename}')
-
     shutil.copyfile(input_filename, output_filename)
-
+    parser = HTMLParser(output_filename)
     logger.info(f'Finished translating {input_filename} into {output_filename}')

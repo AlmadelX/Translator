@@ -14,8 +14,8 @@ class Logger:
             format=self.LOGGING_FORMAT,
             datefmt=self.DATE_FORMAT)
 
-    def info(self, message):
+    def info(self, message: str):
         logging.info(message)
 
-    def warn(self, message):
+    def warn(self, message: str):
         logging.warning(message)
