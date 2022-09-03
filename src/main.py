@@ -1,4 +1,9 @@
 import argparse
+import shutil
+
+from dotenv import load_dotenv
+
+from src.logger import Logger
 
 
 def get_input():
@@ -12,6 +17,7 @@ def get_input():
 
 
 def main():
+    load_dotenv()
     input_filename, output_filename = get_input()
-    print(input_filename)
-    print(output_filename)
+    logger = Logger(input_filename)
+    shutil.copyfile(input_filename, output_filename)
