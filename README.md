@@ -1,21 +1,28 @@
 # Translator
 Использование:
-1. Настройте файл ```.env```:
-   ```
-   DEEPL_AUTH_KEY=DeepL_API_auth_key
-   ```
-2. Настройте файл ```config.ini```:
-   ```
-   [CONFIG]
-   HTML_FILE = path_to/file.html
-   LOG_FILE = path_to/logfile.log
-   LANGUAGE = target_language_code
-   GLOSSARY = glossary_id
-   ```
-3. Настройте среду и зависимости:
+1. Откройте текущую папку в командной строке
+2. Настройте среду и зависимости:
+   
+   Unix:
    ```commandline
    python3 -m venv .venv
+   source .venv/bin/activate
    pip3 install -r requirements.txt
+   ```
+   Windows:
+   ```commandline
+   python3 -m venv .venv
+   .venv/bin/activate.bat
+   pip3 install -r requirements.txt
+   ```
+
+3. Настройте файл ```config.ini```:
+   ```
+   [CONFIG]
+   HTML_FILE = абсолютный_путь_к_перевродимому_файлу/file.html
+   LOG_FILE = абсолютный_путь_к_лог-файлу/logfile.log
+   LANGUAGE = код_конечного_языка
+   GLOSSARY = ID_глоссария
    ```
 4. Запустите скрипт:
    ```commandline
