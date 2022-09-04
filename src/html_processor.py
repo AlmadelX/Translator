@@ -3,6 +3,8 @@ from typing import Optional
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString
 
+from src.translator import Translator
+
 
 class HTMLProcessor:
     __PARSER = 'html.parser'
@@ -10,6 +12,7 @@ class HTMLProcessor:
     def __init__(self, filename: str):
         with open(filename) as file:
             self.__soup = BeautifulSoup(file, self.__PARSER)
+        self.__translator = Translator()
 
     def process(self):
         self.__walkthrough(self.__soup.html)

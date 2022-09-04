@@ -1,5 +1,7 @@
 import argparse
 
+from dotenv import load_dotenv
+
 from src.html_processor import HTMLProcessor
 
 
@@ -11,6 +13,8 @@ def get_filename() -> str:
 
 
 def main():
+    load_dotenv()
+
     filename = get_filename()
 
     processor = HTMLProcessor(filename)
