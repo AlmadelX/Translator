@@ -1,4 +1,4 @@
-import argparse
+from configparser import ConfigParser
 from typing import Tuple, Optional
 
 from dotenv import load_dotenv
@@ -8,17 +8,13 @@ from src.logger import Logger
 
 
 def get_user_input() -> Tuple[str, str, str, Optional[str]]:
-    arguments_parser = argparse.ArgumentParser()
-    arguments_parser.add_argument('-f', type=str, required=True)
-    arguments_parser.add_argument('--logfile', type=str, required=True)
-    arguments_parser.add_argument('--language', type=str, required=True)
-    arguments_parser.add_argument('--glossary', type=str, required=False)
-    arguments = arguments_parser.parse_args()
+    config_parser = ConfigParser()
+    config_parser.read('config.ini')
     return (
-        arguments.f,
-        arguments.logfile,
-        arguments.language,
-        arguments.glossary
+        config_parser['CONFIG']['HTML_FILE'],
+        config_parser['CONFIG']['LOG_FILE'],
+        config_parser['CONFIG']['LANGUAGE'],
+        config_parser['CONFIG']['GLOSSARY']
     )
 
 
