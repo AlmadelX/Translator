@@ -13,32 +13,34 @@ class HTMLProcessor:
     def __init__(
             self,
             filename: str,
-            log_filename: str,
             language: str,
-            glossary: Optional[str]
+            glossary: Optional[str],
+            logger: Logger
     ):
         self.__filename = filename
+        self.__language = language
         with open(self.__filename) as file:
             self.__soup = BeautifulSoup(file, self.__PARSER)
-        self.__translator = Translator(language, glossary)
-        self.__logger = Logger(log_filename)
+        self.__translator = Translator(
+            self.__language,
+            glossary,
+            self.__filename,
+            logger
+        )
 
     def process(self):
-        self.__walkthrough(self.__soup.html)
+        self.__walkthrough(self.__soup)
+        if self.__soup.html.get('lang'):
+            self.__soup.html['lang'] = self.__language
+        with open(self.__filename, 'w') as file:
+            file.write(self.__soup.prettify(formatter='html5'))
 
     def __walkthrough(self, current: Tag):
         for child in current.children:
             if not isinstance(child, Tag) or self.__skip(element=child):
                 continue
 
-            if text := self.__get_text_for_translation(element=child):
-                result = self.__translator.translate(text)
-                if text == result:
-                    message = f'Unsuccessful translation on \
-"{self.__filename}" at line {child.sourceline}:\n{text}'
-                    self.__logger.warn(message)
-                print(result)
-            else:
+            if not self.__translate(element=child):
                 self.__walkthrough(child)
 
     @staticmethod
@@ -46,8 +48,7 @@ class HTMLProcessor:
         if 'notranslate' in element.get_attribute_list('class'):
             return True
 
-    @staticmethod
-    def __get_text_for_translation(*, element: Tag) -> Optional[str]:
+    def __translate(self, *, element: Tag) -> bool:
         match len(element.contents):
             case 0:
                 if element.name == 'meta' and (
@@ -59,10 +60,18 @@ class HTMLProcessor:
                             'twitter:description'
                         ]
                 ):
-                    return element.get('content')
+                    element['content'] = self.__translator.translate(
+                        element['content'],
+                        element.sourceline
+                    )
+                    return True
 
-                if alt := element.get('alt'):
-                    return alt
+                if element.get('alt'):
+                    element['alt'] = self.__translator.translate(
+                        element['alt'],
+                        element.sourceline
+                    )
+                    return True
             case 1:
                 if isinstance(element.contents[0], NavigableString) and (
                         element.name in [
@@ -78,5 +87,9 @@ class HTMLProcessor:
                             'span'
                         ]
                 ):
-                    return element.string
-        return None
+                    element.string = self.__translator.translate(
+                        str(element.string),
+                        element.sourceline
+                    )
+                    return True
+        return False
