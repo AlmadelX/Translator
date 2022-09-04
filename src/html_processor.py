@@ -3,16 +3,25 @@ from typing import Optional
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString
 
+from src.logger import Logger
 from src.translator import Translator
 
 
 class HTMLProcessor:
     __PARSER = 'html.parser'
 
-    def __init__(self, filename: str, language: str, glossary: Optional[str]):
-        with open(filename) as file:
+    def __init__(
+            self,
+            filename: str,
+            log_filename: str,
+            language: str,
+            glossary: Optional[str]
+    ):
+        self.__filename = filename
+        with open(self.__filename) as file:
             self.__soup = BeautifulSoup(file, self.__PARSER)
         self.__translator = Translator(language, glossary)
+        self.__logger = Logger(log_filename)
 
     def process(self):
         self.__walkthrough(self.__soup.html)
@@ -24,6 +33,10 @@ class HTMLProcessor:
 
             if text := self.__get_text_for_translation(element=child):
                 result = self.__translator.translate(text)
+                if text == result:
+                    message = f'Unsuccessful translation on \
+"{self.__filename}" at line {child.sourceline}:\n{text}'
+                    self.__logger.warn(message)
                 print(result)
             else:
                 self.__walkthrough(child)
