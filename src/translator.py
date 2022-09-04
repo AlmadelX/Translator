@@ -1,16 +1,22 @@
 import os
+from typing import Optional
 
 import deepl
 
 
 class Translator:
-    def __init__(self):
+    __SOURCE_LANG = 'EN'
+
+    def __init__(self, language: str, glossary: Optional[str]):
+        self.__language = language
+        self.__glossary = glossary
         self.__deepl_translator = deepl.Translator(os.getenv('DEEPL_AUTH_KEY'))
-        entries = {"artist": "Maler", "prize": "Gewinn"}
-        sample_glossary = self.__deepl_translator.create_glossary(
-            'Sample Glossary',
-            source_lang='EN',
-            target_lang='DE',
-            entries=entries
-        )
-        print(sample_glossary.glossary_id)
+
+    def translate(self, text: str) -> str:
+        result = str(self.__deepl_translator.translate_text(
+            text,
+            source_lang=self.__SOURCE_LANG,
+            target_lang=self.__language,
+            glossary=self.__glossary
+        ))
+        return result

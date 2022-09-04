@@ -9,10 +9,10 @@ from src.translator import Translator
 class HTMLProcessor:
     __PARSER = 'html.parser'
 
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, language: str, glossary: Optional[str]):
         with open(filename) as file:
             self.__soup = BeautifulSoup(file, self.__PARSER)
-        self.__translator = Translator()
+        self.__translator = Translator(language, glossary)
 
     def process(self):
         self.__walkthrough(self.__soup.html)
@@ -23,7 +23,8 @@ class HTMLProcessor:
                 continue
 
             if text := self.__get_text_for_translation(element=child):
-                print(text)
+                result = self.__translator.translate(text)
+                print(result)
             else:
                 self.__walkthrough(child)
 

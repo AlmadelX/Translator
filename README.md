@@ -6,5 +6,5 @@ Usage:
     ```
 2. Run the script:
     ```commandline
-    python translator.py -f path_to/file.html 
+    python translator.py -f path_to/file.html --language target_language_code [--glossary glossary_id]
     ```
