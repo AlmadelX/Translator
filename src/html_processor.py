@@ -37,10 +37,17 @@ class HTMLProcessor:
 
     def __walkthrough(self, current: Tag):
         for child in current.children:
-            if not isinstance(child, Tag) or self.__skip(element=child):
+            if isinstance(child, NavigableString) and not str(child).isspace():
+                translation = self.__translator.translate(
+                    str(child),
+                    current.sourceline
+                )
+                child.replace_with(translation)
                 continue
-
-            if not self.__translate(element=child):
+            if isinstance(child, Tag) and (
+                    self.__skip(element=child) or not
+                    self.__translate_as_tag(child)
+            ):
                 self.__walkthrough(child)
 
     @staticmethod
@@ -48,48 +55,25 @@ class HTMLProcessor:
         if 'notranslate' in element.get_attribute_list('class'):
             return True
 
-    def __translate(self, *, element: Tag) -> bool:
-        match len(element.contents):
-            case 0:
-                if element.name == 'meta' and (
-                        element.get('name') == 'description' or
-                        element.get('property') in [
-                            'og:title',
-                            'og:description',
-                            'twitter:title',
-                            'twitter:description'
-                        ]
-                ):
-                    element['content'] = self.__translator.translate(
-                        element['content'],
-                        element.sourceline
-                    )
-                    return True
-
-                if element.get('alt'):
-                    element['alt'] = self.__translator.translate(
-                        element['alt'],
-                        element.sourceline
-                    )
-                    return True
-            case 1:
-                if isinstance(element.contents[0], NavigableString) and (
-                        element.name in [
-                            'title',
-                            'h1',
-                            'h2',
-                            'h3',
-                            'h4',
-                            'h5',
-                            'h6',
-                            'div',
-                            'a',
-                            'span'
-                        ]
-                ):
-                    element.string = self.__translator.translate(
-                        str(element.string),
-                        element.sourceline
-                    )
-                    return True
+    def __translate_as_tag(self, element: Tag) -> bool:
+        if element.name == 'meta' and (
+                element.get('name') == 'description' or
+                element.get('property') in [
+                    'og:title',
+                    'og:description',
+                    'twitter:title',
+                    'twitter:description'
+                ]
+        ):
+            element['content'] = self.__translator.translate(
+                element['content'],
+                element.sourceline
+            )
+            return True
+        if element.get('alt'):
+            element['alt'] = self.__translator.translate(
+                element['alt'],
+                element.sourceline
+            )
+            return True
         return False
