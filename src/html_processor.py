@@ -29,7 +29,7 @@ class HTMLProcessor:
         )
 
     def process(self):
-        self.__walkthrough(self.__soup)
+        self.__walkthrough(self.__soup.html)
         if self.__soup.html.get('lang'):
             self.__soup.html['lang'] = self.__language
         with open(self.__filename, 'w') as file:
@@ -43,17 +43,17 @@ class HTMLProcessor:
                     current.sourceline
                 )
                 child.replace_with(translation)
-                continue
-            if isinstance(child, Tag) and (
-                    self.__skip(element=child) or not
-                    self.__translate_as_tag(child)
-            ):
+            elif isinstance(child, Tag) and not \
+                    self.__skip(element=child) and not \
+                    self.__translate_as_tag(child):
                 self.__walkthrough(child)
 
     @staticmethod
     def __skip(*, element: Tag) -> bool:
-        if 'notranslate' in element.get_attribute_list('class'):
+        if 'notranslate' in element.get_attribute_list('class') \
+                or element.name == 'script' or element.name == 'style':
             return True
+        return False
 
     def __translate_as_tag(self, element: Tag) -> bool:
         if element.name == 'meta' and (
