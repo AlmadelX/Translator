@@ -1,3 +1,4 @@
+import os
 from configparser import ConfigParser
 from glob import glob
 from os.path import join
@@ -12,11 +13,12 @@ from src.logger import Logger
 def get_user_input() -> Tuple[str, str, str, Optional[str]]:
     config_parser = ConfigParser()
     config_parser.read('config.ini')
+    os.environ['DEBUG'] = config_parser['CONFIG']['DEBUG']
     return (
         config_parser['CONFIG']['DIRECTORY'],
         config_parser['CONFIG']['LOG_FILE'],
         config_parser['CONFIG']['LANGUAGE'],
-        config_parser['CONFIG']['GLOSSARY']
+        config_parser['CONFIG']['GLOSSARY'],
     )
 
 

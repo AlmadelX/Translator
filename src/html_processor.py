@@ -1,7 +1,7 @@
 from typing import Optional
 
 from bs4 import BeautifulSoup
-from bs4.element import Tag, NavigableString
+from bs4.element import Tag, NavigableString, Comment
 
 from src.logger import Logger
 from src.translator import Translator
@@ -40,6 +40,8 @@ class HTMLProcessor:
 
     def __walkthrough(self, current: Tag):
         for child in current.children:
+            if isinstance(child, Comment):
+                continue
             if isinstance(child, NavigableString) and not str(child).isspace():
                 translation = self.__translator.translate(
                     str(child),

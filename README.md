@@ -23,6 +23,7 @@
    LOG_FILE = абсолютный_путь_к_лог-файлу/logfile.log
    LANGUAGE = код_конечного_языка
    GLOSSARY = ID_глоссария
+   DEBUG = true (выводит запросы к API в лог, false - не делает этого)
    ```
 4. Запустите скрипт:
    ```commandline

@@ -23,6 +23,8 @@ class Translator:
         self.__deepl_translator = deepl.Translator(os.getenv('DEEPL_AUTH_KEY'))
 
     def translate(self, text: str, line_number: int) -> str:
+        if os.getenv('DEBUG') == 'true':
+            self.__logger.info(f'Translating:\n{text}')
         result = str(self.__deepl_translator.translate_text(
             text,
             source_lang=self.__SOURCE_LANG,

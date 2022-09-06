@@ -23,4 +23,3 @@ class Logger:
     @staticmethod
     def info(message: str):
         logging.info(message)
-
