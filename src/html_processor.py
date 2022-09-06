@@ -19,21 +19,24 @@ class HTMLProcessor:
     ):
         self.__filename = filename
         self.__language = language
+        self.__logger = logger
         with open(self.__filename) as file:
             self.__soup = BeautifulSoup(file, self.__PARSER)
         self.__translator = Translator(
             self.__language,
             glossary,
             self.__filename,
-            logger
+            self.__logger
         )
 
     def process(self):
+        self.__logger.info(f'Started translating {self.__filename}')
         self.__walkthrough(self.__soup.html)
         if self.__soup.html.get('lang'):
             self.__soup.html['lang'] = self.__language
         with open(self.__filename, 'w') as file:
             file.write(self.__soup.prettify(formatter='html5'))
+        self.__logger.info(f'Finished translating {self.__filename}')
 
     def __walkthrough(self, current: Tag):
         for child in current.children:

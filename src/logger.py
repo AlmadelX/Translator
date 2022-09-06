@@ -19,3 +19,8 @@ class Logger:
     @staticmethod
     def warn(message: str):
         logging.warning(message)
+
+    @staticmethod
+    def info(message: str):
+        logging.info(message)
+

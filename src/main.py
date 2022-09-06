@@ -1,4 +1,6 @@
 from configparser import ConfigParser
+from glob import glob
+from os.path import join
 from typing import Tuple, Optional
 
 from dotenv import load_dotenv
@@ -11,7 +13,7 @@ def get_user_input() -> Tuple[str, str, str, Optional[str]]:
     config_parser = ConfigParser()
     config_parser.read('config.ini')
     return (
-        config_parser['CONFIG']['HTML_FILE'],
+        config_parser['CONFIG']['DIRECTORY'],
         config_parser['CONFIG']['LOG_FILE'],
         config_parser['CONFIG']['LANGUAGE'],
         config_parser['CONFIG']['GLOSSARY']
@@ -20,9 +22,10 @@ def get_user_input() -> Tuple[str, str, str, Optional[str]]:
 
 def main():
     load_dotenv()
-    filename, log_filename, language, glossary = get_user_input()
+    directory_name, log_filename, language, glossary = get_user_input()
 
     logger = Logger(log_filename)
 
-    processor = HTMLProcessor(filename, language, glossary, logger)
-    processor.process()
+    for filename in glob(join(directory_name, '*.html')):
+        processor = HTMLProcessor(filename, language, glossary, logger)
+        processor.process()
