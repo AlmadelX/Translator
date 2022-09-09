@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, List
 
 import deepl
 
@@ -23,17 +23,16 @@ class Translator:
 
         self.__deepl_translator = deepl.Translator(os.getenv('DEEPL_AUTH_KEY'))
 
-    def translate(self, text: str, line_number: int) -> str:
-        if os.getenv('DEBUG') == 'true':
-            self.__logger.info(f'Translating:\n{text}')
-        result = str(self.__deepl_translator.translate_text(
-            text,
+    def translate(self, texts: List[str], line_numbers: List[int]) -> str:
+        results = [str(txt) for txt in self.__deepl_translator.translate_text(
+            texts,
             source_lang=self.__SOURCE_LANG,
             target_lang=self.__language,
             glossary=self.__glossary
-        ))
-        if text == result:
-            message = f'Unsuccessful translation on \
+        )]
+        for text, result, line_number in zip(texts, results, line_numbers):
+            if text == result:
+                message = f'Unsuccessful translation on \
 "{self.__filename}" at line {line_number}:\n{text}'
-            self.__logger.warn(message)
-        return result
+                self.__logger.warn(message)
+        return results

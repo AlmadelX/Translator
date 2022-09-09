@@ -34,10 +34,16 @@ class HTMLProcessor:
         self.__logger.info(f'Started translating {self.__filename}')
 
         texts = []
+        sourcelines = []
         self.__walkthrough(
-            (lambda s: [texts.append(s), s][-1]),
+            (lambda text, sourceline: [
+                texts.append(text), 
+                sourcelines.append(sourceline), 
+                text
+            ][-1]),
             current=self.__soup.html
         )
+        texts = self.__translator.translate(texts, sourcelines)
         print(texts)
 
         if self.__soup.html.get('lang'):
@@ -49,14 +55,14 @@ class HTMLProcessor:
 
     def __walkthrough(
         self,
-        handle: Callable[[str], str], *,
+        handle: Callable[[str, int], str], *,
         current: Tag
     ):
         for child in current.children:
             if isinstance(child, Comment):
                 continue
             if isinstance(child, NavigableString) and not str(child).isspace():
-                child.replace_with(handle(child))
+                child.replace_with(handle(child, current.sourceline))
             elif isinstance(child, Tag) and not \
                     self.__skip(element=child) and not \
                     self.__handle_as_tag(handle, element=child):
@@ -83,9 +89,9 @@ class HTMLProcessor:
                     'twitter:description'
                 ]
         ):
-            element['content'] = handle(element['content'])
+            element['content'] = handle(element['content'], element.sourceline)
             return True
         if element.get('alt'):
-            element['alt'] = handle(element['alt'])
+            element['alt'] = handle(element['alt'], element.sourceline)
             return True
         return False
