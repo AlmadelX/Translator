@@ -44,7 +44,10 @@ class HTMLProcessor:
             current=self.__soup.html
         )
         texts = self.__translator.translate(texts, sourcelines)
-        print(texts)
+        self.__walkthrough(
+            (lambda text, sourceline: texts.pop(0)),
+            current=self.__soup.html
+        )
 
         if self.__soup.html.get('lang'):
             self.__soup.html['lang'] = self.__language
