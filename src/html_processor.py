@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Callable, Optional
 
 from bs4 import BeautifulSoup
 from bs4.element import Tag, NavigableString, Comment
@@ -20,6 +20,7 @@ class HTMLProcessor:
         self.__filename = filename
         self.__language = language
         self.__logger = logger
+
         with open(self.__filename) as file:
             self.__soup = BeautifulSoup(file, self.__PARSER)
         self.__translator = Translator(
@@ -31,27 +32,35 @@ class HTMLProcessor:
 
     def process(self):
         self.__logger.info(f'Started translating {self.__filename}')
-        self.__walkthrough(self.__soup.html)
+
+        texts = []
+        self.__walkthrough(
+            (lambda s: [texts.append(s), s][-1]),
+            current=self.__soup.html
+        )
+        print(texts)
+
         if self.__soup.html.get('lang'):
             self.__soup.html['lang'] = self.__language
         with open(self.__filename, 'w') as file:
             file.write(self.__soup.prettify(formatter='html5'))
+
         self.__logger.info(f'Finished translating {self.__filename}')
 
-    def __walkthrough(self, current: Tag):
+    def __walkthrough(
+        self,
+        handle: Callable[[str], str], *,
+        current: Tag
+    ):
         for child in current.children:
             if isinstance(child, Comment):
                 continue
             if isinstance(child, NavigableString) and not str(child).isspace():
-                translation = self.__translator.translate(
-                    str(child),
-                    current.sourceline
-                )
-                child.replace_with(translation)
+                child.replace_with(handle(child))
             elif isinstance(child, Tag) and not \
                     self.__skip(element=child) and not \
-                    self.__translate_as_tag(child):
-                self.__walkthrough(child)
+                    self.__handle_as_tag(handle, element=child):
+                self.__walkthrough(handle, current=child)
 
     @staticmethod
     def __skip(*, element: Tag) -> bool:
@@ -60,7 +69,11 @@ class HTMLProcessor:
             return True
         return False
 
-    def __translate_as_tag(self, element: Tag) -> bool:
+    def __handle_as_tag(
+        self, 
+        handle: Callable[[str], str], *,
+        element: Tag
+    ) -> bool:
         if element.name == 'meta' and (
                 element.get('name') == 'description' or
                 element.get('property') in [
@@ -70,15 +83,9 @@ class HTMLProcessor:
                     'twitter:description'
                 ]
         ):
-            element['content'] = self.__translator.translate(
-                element['content'],
-                element.sourceline
-            )
+            element['content'] = handle(element['content'])
             return True
         if element.get('alt'):
-            element['alt'] = self.__translator.translate(
-                element['alt'],
-                element.sourceline
-            )
+            element['alt'] = handle(element['alt'])
             return True
         return False

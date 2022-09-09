@@ -20,6 +20,7 @@ class Translator:
         self.__glossary = glossary
         self.__filename = filename
         self.__logger = logger
+
         self.__deepl_translator = deepl.Translator(os.getenv('DEEPL_AUTH_KEY'))
 
     def translate(self, text: str, line_number: int) -> str:
