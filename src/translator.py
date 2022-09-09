@@ -2,6 +2,7 @@ import os
 from typing import Optional, List
 
 import deepl
+import pandas
 
 from src.logger import Logger
 
@@ -22,6 +23,14 @@ class Translator:
         self.__logger = logger
 
         self.__deepl_translator = deepl.Translator(os.getenv('DEEPL_AUTH_KEY'))
+
+        file_base_name = self.__filename.rsplit('.', maxsplit=1)[0]
+        dictionary_name = f'{file_base_name}_{self.__SOURCE_LANG}_\
+{self.__language}.csv'
+        with open(dictionary_name, 'w+') as dictionary:
+            dictionary.write('text,translation,time\n')
+        self.__dictionary = pandas.read_csv(dictionary_name)
+        print(self.__dictionary.head())
 
     def translate(self, texts: List[str], line_numbers: List[int]) -> str:
         results = [str(txt) for txt in self.__deepl_translator.translate_text(

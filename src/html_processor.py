@@ -37,8 +37,8 @@ class HTMLProcessor:
         sourcelines = []
         self.__walkthrough(
             (lambda text, sourceline: [
-                texts.append(text), 
-                sourcelines.append(sourceline), 
+                texts.append(text),
+                sourcelines.append(sourceline),
                 text
             ][-1]),
             current=self.__soup.html
@@ -79,7 +79,7 @@ class HTMLProcessor:
         return False
 
     def __handle_as_tag(
-        self, 
+        self,
         handle: Callable[[str], str], *,
         element: Tag
     ) -> bool:
