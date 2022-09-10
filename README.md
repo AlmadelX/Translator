@@ -19,10 +19,11 @@
 3. Настройте файл ```config.ini```:
    ```
    [CONFIG]
+   DEEPL_AUTH_KEY = ключ_DEEPL_API
    DIRECTORY = абсолютный_путь_к_директории_с_переводимыми_файлами
-   LOG_FILE = абсолютный_путь_к_лог-файлу/logfile.log
-   LANGUAGE = код_конечного_языка
    GLOSSARY = ID_глоссария
+   LANGUAGE = код_конечного_языка
+   LOG_FILE = абсолютный_путь_к_лог-файлу/logfile.log
    ```
 4. Запустите скрипт:
    ```commandline
