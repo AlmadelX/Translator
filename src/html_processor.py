@@ -83,17 +83,37 @@ class HTMLProcessor:
         handle: Callable[[str], str], *,
         element: Tag
     ) -> bool:
-        if element.name == 'meta' and (
-                element.get('name') == 'description' or
-                element.get('property') in [
-                    'og:title',
-                    'og:description',
-                    'twitter:title',
-                    'twitter:description'
-                ]
-        ):
-            element['content'] = handle(element['content'], element.sourceline)
-            return True
+        match element.name:
+            case 'meta':
+                if (
+                    element.get('name') == 'description' or
+                    element.get('property') in [
+                        'og:title',
+                        'og:description',
+                        'twitter:title',
+                        'twitter:description'
+                    ]
+                ):
+                    element['content'] = handle(
+                        element['content'],
+                        element.sourceline
+                    )
+                    return True
+            case 'input':
+                handled = False
+                if element.has_attr('data-wait'):
+                    element['data-wait'] = handle(
+                        element['data-wait'],
+                        element.sourceline
+                    )
+                    handled = True
+                if element.has_attr('value'):
+                    element['value'] = handle(
+                        element['value'],
+                        element.sourceline
+                    )
+                    handled = True
+                return handled
         if element.get('alt'):
             element['alt'] = handle(element['alt'], element.sourceline)
             return True
