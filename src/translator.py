@@ -27,17 +27,16 @@ class Translator:
         file_base_name = self.__filename.rsplit('.', maxsplit=1)[0]
         self.__dictionary_name = f'{file_base_name}_{self.__SOURCE_LANG}_\
 {self.__language}.csv'
-        if not os.path.exists(self.__dictionary_name):
-            with open(self.__dictionary_name, 'w+') as dictionary:
-                dictionary.write('text,translation,time\n')
-        with open(self.__dictionary_name, 'r') as dictionary:
-            self.__dictionary = list(csv.reader(dictionary))
-        print(self.__dictionary)
+        self.__old_dictionary = []
+        if os.path.exists(self.__dictionary_name):
+            with open(self.__dictionary_name, 'r') as dictionary:
+                self.__old_dictionary = list(csv.reader(dictionary))
+        self.__new_dictionary = [['text', 'translation', 'time']]
 
     def __del__(self):
         with open(self.__dictionary_name, 'w') as dictionary:
             csv.writer(dictionary, quotechar='"', quoting=csv.QUOTE_ALL)\
-                .writerows(self.__dictionary)
+                .writerows(self.__new_dictionary)
 
     def translate(self, texts: List[str], line_numbers: List[int]) -> str:
         results = [None] * len(texts)
