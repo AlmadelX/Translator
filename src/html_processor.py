@@ -37,7 +37,7 @@ class HTMLProcessor:
         sourcelines = []
         self.__walkthrough(
             (lambda text, sourceline: [
-                texts.append(text),
+                texts.append(text.strip()),
                 sourcelines.append(sourceline),
                 text
             ][-1]),

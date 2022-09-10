@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 import os
 from typing import Optional, List
 
@@ -40,18 +41,34 @@ class Translator:
 
     def translate(self, texts: List[str], line_numbers: List[int]) -> str:
         results = [None] * len(texts)
+        updates = [None] * len(texts)
         translation = []
         for i in range(len(texts)):
-            translation.append(texts[i])
-        translation = [str(s) for s in self.__deepl_translator.translate_text(
-            translation,
-            source_lang=self.__SOURCE_LANG,
-            target_lang=self.__language,
-            glossary=self.__glossary
-        )]
+            for cache in self.__old_dictionary:
+                if texts[i] == cache[0]:
+                    results[i] = cache[1]
+                    updates[i] = cache[2]
+                    break
+            else:
+                translation.append(texts[i])
+
+        if len(translation) > 0:
+            translation = [
+                str(s) for s in self.__deepl_translator.translate_text(
+                    translation,
+                    source_lang=self.__SOURCE_LANG,
+                    target_lang=self.__language,
+                    glossary=self.__glossary
+                )
+            ]
+
         for i in range(len(results)):
             if results[i] is None:
                 results[i] = translation.pop(0)
+                updates[i] = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+            cache = [texts[i], results[i], updates[i]]
+            if cache not in self.__new_dictionary:
+                self.__new_dictionary.append(cache)
 
         for text, result, line_number in zip(texts, results, line_numbers):
             if text == result:
