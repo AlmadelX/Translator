@@ -1,8 +1,8 @@
+import csv
 import os
 from typing import Optional, List
 
 import deepl
-import pandas
 
 from src.logger import Logger
 
@@ -25,20 +25,35 @@ class Translator:
         self.__deepl_translator = deepl.Translator(os.getenv('DEEPL_AUTH_KEY'))
 
         file_base_name = self.__filename.rsplit('.', maxsplit=1)[0]
-        dictionary_name = f'{file_base_name}_{self.__SOURCE_LANG}_\
+        self.__dictionary_name = f'{file_base_name}_{self.__SOURCE_LANG}_\
 {self.__language}.csv'
-        with open(dictionary_name, 'w+') as dictionary:
-            dictionary.write('text,translation,time\n')
-        self.__dictionary = pandas.read_csv(dictionary_name)
-        print(self.__dictionary.head())
+        if not os.path.exists(self.__dictionary_name):
+            with open(self.__dictionary_name, 'w+') as dictionary:
+                dictionary.write('text,translation,time\n')
+        with open(self.__dictionary_name, 'r') as dictionary:
+            self.__dictionary = list(csv.reader(dictionary))
+        print(self.__dictionary)
+
+    def __del__(self):
+        with open(self.__dictionary_name, 'w') as dictionary:
+            csv.writer(dictionary, quotechar='"', quoting=csv.QUOTE_ALL)\
+                .writerows(self.__dictionary)
 
     def translate(self, texts: List[str], line_numbers: List[int]) -> str:
-        results = [str(txt) for txt in self.__deepl_translator.translate_text(
-            texts,
+        results = [None] * len(texts)
+        translation = []
+        for i in range(len(texts)):
+            translation.append(texts[i])
+        translation = [str(s) for s in self.__deepl_translator.translate_text(
+            translation,
             source_lang=self.__SOURCE_LANG,
             target_lang=self.__language,
             glossary=self.__glossary
         )]
+        for i in range(len(results)):
+            if results[i] is None:
+                results[i] = translation.pop(0)
+
         for text, result, line_number in zip(texts, results, line_numbers):
             if text == result:
                 message = f'Unsuccessful translation on \
