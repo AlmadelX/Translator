@@ -21,7 +21,7 @@ class HTMLProcessor:
         self.__language = language
         self.__logger = logger
 
-        with open(self.__filename) as file:
+        with open(self.__filename, 'r', encoding='utf8') as file:
             self.__soup = BeautifulSoup(file, self.__PARSER)
         self.__translator = Translator(
             self.__language,
@@ -51,7 +51,7 @@ class HTMLProcessor:
 
         if self.__soup.html.get('lang'):
             self.__soup.html['lang'] = self.__language
-        with open(self.__filename, 'w') as file:
+        with open(self.__filename, 'w', encoding='utf8') as file:
             file.write(self.__soup.prettify(formatter='html5'))
 
         self.__logger.info(f'Finished translating {self.__filename}')
