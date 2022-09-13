@@ -30,12 +30,16 @@ class Translator:
 {self.__language}.csv'
         self.__old_dictionary = []
         if os.path.exists(self.__dictionary_name):
-            with open(self.__dictionary_name, 'r') as dictionary:
+            with open(
+                self.__dictionary_name, 'r', encoding='utf8'
+            ) as dictionary:
                 self.__old_dictionary = list(csv.reader(dictionary))
         self.__new_dictionary = [['text', 'translation', 'time']]
 
     def __del__(self):
-        with open(self.__dictionary_name, 'w') as dictionary:
+        with open(
+            self.__dictionary_name, 'w', encoding='utf8', newline=''
+        ) as dictionary:
             csv.writer(dictionary, quotechar='"', quoting=csv.QUOTE_ALL)\
                 .writerows(self.__new_dictionary)
 

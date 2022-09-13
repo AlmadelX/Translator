@@ -15,7 +15,8 @@ def get_user_input() -> Tuple[str, str, str, Optional[str]]:
         config_parser['CONFIG']['DIRECTORY'],
         config_parser['CONFIG']['LOG_FILE'],
         config_parser['CONFIG']['LANGUAGE'],
-        config_parser['CONFIG']['GLOSSARY'],
+        config_parser['CONFIG']['GLOSSARY'] if (
+            config_parser.has_option('CONFIG', 'GLOSSARY')) else None,
     )
 
 
